@@ -26,7 +26,7 @@ namespace WindowsFormCountries
             //DATA GRID
             lCountries = GetCountries();
             //izvor podataka za listu se nalazi u objektu dataGridViewCountries
-            dataGridViewCountries.DataSource = lCountries; 
+            dataGridViewCountries.DataSource = lCountries;
 
             //COMBO BOX filtriranje
             //lista za regije, lista je string tako da sprema samo string vrijednosti, dohvaća vrijednosti Region
@@ -34,6 +34,7 @@ namespace WindowsFormCountries
             //Na index 0 u listi dodajemo odabir "Svi kontinenti
             lRegions.Insert(0, "Svi kontinenti");
             comboBoxRegion.DataSource = lRegions; //uspoređuje naziv člana padajućeg izbornika s nazivom regije iz liste lRegions
+            comboBoxRegions.DataSource = lRegions;
 
             //COMBO BOX sortiranje
             List<String> lSortCriterias = new List<String>()
@@ -51,6 +52,21 @@ namespace WindowsFormCountries
         {
             //čitanje odabrane vrijednosti
             string sRegion = (string)comboBoxRegion.SelectedItem; // odabrana vrijednost
+            lCountries = GetCountries();
+            if (sRegion != "Svi kontinenti")
+            {
+                lCountries = lCountries.Where(o => o.sRegion == sRegion).ToList();
+                dataGridViewCountries.DataSource = lCountries;
+            }
+            else
+            {
+                dataGridViewCountries.DataSource = lCountries;
+            }
+        }
+
+        private void comboBoxRegions_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string sRegion = (string)comboBoxRegions.SelectedItem; // odabrana vrijednost
             lCountries = GetCountries();
             if (sRegion != "Svi kontinenti")
             {
@@ -102,6 +118,7 @@ namespace WindowsFormCountries
                 string capital = (string)item.GetValue("capital");
                 int population = (int)item.GetValue("population");
                 float area = -1;
+                //exception catcher, vrijednost područja ne može biti NULL
                 if (item.GetValue("area").Type == JTokenType.Null)
                 {
                     area = 0;
@@ -141,6 +158,40 @@ namespace WindowsFormCountries
             result = responseStream.ReadToEnd();
             webresponse.Close();
             return result;
+        }
+
+        private void textBoxSearch_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void btnSearch_click(object sender, EventArgs e)
+        {
+            string sPretrazi = textBoxSearch.Text;
+            var vPretrazi = from c in lCountries where c.sName.Contains(sPretrazi) select c;
+            List<Country> lPretrazeneDrzave = vPretrazi.ToList();
+            dataGridViewCountries.DataSource = lPretrazeneDrzave.OrderBy(o => o.sName).ToList();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            string NewCode = textBox2.Text;
+            string NewName = textBox3.Text;
+            string NewCapital = textBox4.Text;
+            int NewPopulation = Convert.ToInt32(textBox5.Text);
+            float NewArea = Convert.ToSingle(textBox6.Text);
+            string NewRegion = comboBoxRegions.Text;
+            Country Countries = new Country()
+            {
+                sCode = NewCode,
+                sName = NewName,
+                sCapital = NewCapital,
+                nPopulation = NewPopulation,
+                fArea = NewArea,
+                sRegion = NewRegion
+            };
+            lCountries.Add(Countries);
+            dataGridViewCountries.DataSource = lCountries;
         }
     }
 }

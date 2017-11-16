@@ -192,6 +192,7 @@ namespace WindowsFormCountries
             };
             lCountries.Add(Countries);
             dataGridViewCountries.DataSource = lCountries;
+            MessageBox.Show("Zemlja uspješno dodana!");
         }
 
         private void textBox2_TextChanged(object sender, EventArgs e)
